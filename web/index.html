@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Actuele Europese natuurbranddetecties, brandgevaar en officiële waarschuwingen.">
   <title>Brandkaart Europa</title>
-  <link rel="icon" href="brandkaart-logo.svg" type="image/svg+xml">
+  <link rel="icon" href="brandkaart-logo.svg?v=2" type="image/svg+xml">
   <meta name="theme-color" content="#ff3b10">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.css">
   <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.Default.css">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="./" aria-label="Brandkaart, beginpagina"><img class="brand-mark" src="brandkaart-logo.svg" width="41" height="41" alt="" aria-hidden="true"><span><strong>Brandkaart</strong></span></a>
+    <a class="brand" href="./" aria-label="Brandkaart, beginpagina"><img class="brand-mark" src="brandkaart-logo.svg?v=2" width="41" height="41" alt="" aria-hidden="true"><span><strong>Brandkaart</strong></span></a>
     <div class="search-shell" role="search">
       <label class="sr-only" for="location-search">Zoek een plaats of voer coördinaten in</label>
       <span aria-hidden="true">⌕</span><input id="location-search" type="search" autocomplete="off" placeholder="Zoek plaats of coördinaten…" aria-controls="search-results" aria-expanded="false">
-      <button id="locate-button" class="location-button" type="button" aria-label="Gebruik mijn huidige locatie" title="Positie blijft in deze browser"><span aria-hidden="true">◎</span> Mijn locatie</button>
+      <button id="locate-button" class="location-button" type="button" aria-label="Gebruik mijn huidige locatie" title="Positie blijft in deze browser"><svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 19-9-9 19-2-8-8-2Z"/></svg> Mijn locatie</button>
       <div id="search-results" class="search-results" role="listbox" hidden></div>
     </div>
   </header>
@@ -38,11 +38,14 @@
       <button id="panel-close" class="panel-close" type="button" aria-label="Locatiepaneel sluiten">×</button>
       <span class="eyebrow">Geselecteerde locatie</span><h1 id="location-title">Locatie</h1><p id="location-subtitle"></p>
       <div id="overall-status" class="overall-status"><span class="status-icon" aria-hidden="true">i</span><div><span class="eyebrow">Situatie in de omgeving</span><strong id="summary-title">Bezig met bepalen…</strong></div></div>
-      <p id="plain-summary" class="plain-summary"></p>
-      <section class="panel-section"><div class="section-heading"><h2>Brandgevaar</h2><span>Model · geen brandmelding</span></div><div id="danger-summary" class="forecast-strip"></div></section>
-      <section class="panel-section"><div class="section-heading"><h2>Officiële waarschuwingen</h2></div><div id="warning-summary"></div></section>
-      <section class="panel-section"><div class="section-heading"><h2>In de buurt</h2><label>Straal <select id="radius"><option value="25">25 km</option><option value="50">50 km</option></select></label></div><div id="nearby-summary"></div></section>
-      <p class="coverage-note"><strong>Maatregelen:</strong> er zijn nog geen lokale maatregelenbronnen aangesloten. Geen resultaat betekent niet dat er lokaal geen beperking geldt.</p>
+      <button id="panel-expand" class="panel-expand" type="button" aria-expanded="false" aria-controls="detail-panel"><span id="panel-expand-label">Bekijk details</span><span id="panel-expand-icon" aria-hidden="true">↑</span></button>
+      <div class="detail-content">
+        <p id="plain-summary" class="plain-summary"></p>
+        <section class="panel-section"><div class="section-heading"><h2>Brandgevaar</h2><span>Model · geen brandmelding</span></div><div id="danger-summary" class="forecast-strip"></div></section>
+        <section class="panel-section"><div class="section-heading"><h2>Officiële waarschuwingen</h2></div><div id="warning-summary"></div></section>
+        <section class="panel-section"><div class="section-heading"><h2>In de buurt</h2><label>Straal <select id="radius"><option value="25">25 km</option><option value="50">50 km</option></select></label></div><div id="nearby-summary"></div></section>
+        <p class="coverage-note"><strong>Maatregelen:</strong> er zijn nog geen lokale maatregelenbronnen aangesloten. Geen resultaat betekent niet dat er lokaal geen beperking geldt.</p>
+      </div>
     </aside>
     <div class="time-control floating-card" aria-label="Periode en gevaardag"><div class="time-tabs" role="group" aria-label="Detectieperiode"><button data-hours="1" class="active" aria-pressed="true">Nu</button><button data-hours="24" aria-pressed="false">24 uur</button><button data-hours="48" aria-pressed="false">48 uur</button></div><div class="day-tabs" role="group" aria-label="Dag brandgevaar"><button data-day="0" class="active" aria-pressed="true">Vandaag</button><button data-day="1" aria-pressed="false">Morgen</button><button data-day="2" aria-pressed="false">Overmorgen</button></div></div>
     <div class="status-bar">
@@ -56,6 +59,6 @@
     <button id="welcome-ok" class="welcome-ok" type="button">Ok</button>
   </dialog>
   <dialog id="sources-dialog"><div class="dialog-head"><h2>Bronnen, status & uitleg</h2><button type="button" id="sources-close" aria-label="Sluiten">×</button></div><p><strong>Bel bij direct gevaar 112</strong> en volg lokale autoriteiten. Brandkaart geeft geen route- of evacuatieadvies.</p><p>Satellietdetecties zijn thermische anomalieën en dus geen bevestigde natuurbranden. Brandgevaar is een modelinschatting. Uit het verdwijnen van een detectie volgt nooit dat een brand onder controle of geblust is.</p><div id="source-status"></div><h3>Privacy</h3><p>Zoeken gebeurt lokaal en browserlocatie wordt alleen na toestemming gebruikt en niet verstuurd of opgeslagen. Alleen de OpenStreetMap-kaarttegels komen tijdens gebruik van een derde partij; daarbij ontvangt de tegelserver technisch je IP-adres en de gevraagde kaarttegels. Scripts, data en plaatsnamen blijven lokaal.</p><p><strong>Weerwaarschuwingen buiten Spanje</strong> komen van EUMETNET – MeteoAlarm en worden hier <strong>vertraagd</strong> getoond; <a href="https://www.meteoalarm.org" target="_blank" rel="noopener">www.meteoalarm.org</a> is de actuele, gezaghebbende bron.</p><h3>Attributie</h3><ul><li>Fire detections courtesy of NASA FIRMS</li><li>© European Union, Copernicus Emergency Management Service</li><li>© AEMET — datum laatste actualisering wordt hierboven getoond</li><li>Weerwaarschuwingen buiten Spanje: EUMETNET – MeteoAlarm (<a href="https://www.meteoalarm.org" target="_blank" rel="noopener">www.meteoalarm.org</a>), CC BY 4.0</li><li>Source : Météo-France — Licence Ouverte 2.0 — datum laatste actualisering wordt hierboven getoond</li><li>Plaatsnamen: GeoNames (geonames.org), CC BY 4.0</li><li>Kaarttegels © OpenStreetMap-bijdragers</li></ul></dialog>
-  <script src="vendor/leaflet/leaflet.js"></script><script src="vendor/leaflet.markercluster/leaflet.markercluster.js"></script><script src="app-helpers.js?v=1"></script><script src="app.js?v=3"></script>
+  <script src="vendor/leaflet/leaflet.js"></script><script src="vendor/leaflet.markercluster/leaflet.markercluster.js"></script><script src="app-helpers.js?v=1"></script><script src="app.js?v=5"></script>
 </body>
 </html>

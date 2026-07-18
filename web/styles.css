@@ -9,10 +9,10 @@
 .search-shell{display:grid;gap:10px;grid-template-columns:minmax(240px,1fr) auto}
 .search-results{right:124px}
 .location-button{align-items:center;background:var(--forest);border:1px solid var(--forest);border-radius:12px;color:white;cursor:pointer;display:flex;font-size:12px;font-weight:700;gap:7px;height:46px;padding:0 14px;white-space:nowrap}
-.location-button span{font-size:21px;line-height:1}
+.location-icon{display:block;flex:none;height:24px;width:24px}
 .location-button:hover{background:#245548}
 .location-button:focus-visible{outline:3px solid #287cba;outline-offset:2px}
-@media(max-width:850px){.topbar{grid-template-columns:180px 1fr}.location-button{font-size:0;padding:0 12px}.location-button span{font-size:22px}}
+@media(max-width:850px){.topbar{grid-template-columns:180px 1fr}.location-button{flex:none;font-size:0;gap:0;justify-content:center;padding:0;width:46px}}
 @media(max-width:650px){.topbar{display:block;height:118px;padding:9px 11px}.brand{height:42px}.search-shell{grid-template-columns:minmax(0,1fr) auto;margin-top:5px}.search-results{right:55px}main{height:calc(100% - 146px)}}
 .welcome-dialog{max-width:520px;padding:27px}.welcome-dialog h2{font-size:22px;margin:0 0 10px}.welcome-dialog p{font-size:14px;line-height:1.65;margin:0 0 22px}.welcome-ok{background:var(--forest);border:0;border-radius:10px;color:white;cursor:pointer;float:right;font-weight:700;min-width:88px;padding:10px 20px}.welcome-ok:hover{background:#245548}.welcome-ok:focus-visible{outline:3px solid #287cba;outline-offset:2px}
 .map-controls{bottom:48px;left:auto;right:20px;top:auto}
@@ -79,4 +79,32 @@ main{height:calc(100% - 72px)}
   .status-stale{background:#3d3216;color:#e6c877}
   .status-bad{background:#42221c;color:#eeae9f}
   .welcome-ok:hover,.location-button:hover{background:#367a66}
+}
+
+/* Bevestigde incidenten: een ronde marker voorkomt de appelachtige druppelvorm. */
+.symbol.incident{border-radius:50%}
+.incident-marker{border-radius:50%;box-shadow:0 1px 4px rgba(23,35,31,.35);font-size:0;height:30px;width:30px}
+
+.panel-expand{display:none}
+
+/* Mobiele locatiedetails beginnen als compact kaartje en kunnen fullscreen open. */
+@media(max-width:650px){
+  .detail-panel{border-radius:18px;bottom:8px;height:auto;left:8px;max-height:calc(100% - 16px);overflow:hidden;padding:18px;right:8px;top:auto;width:auto}
+  .detail-panel:not(.expanded) .detail-content{display:none}
+  .detail-panel:not(.expanded) h1{font-size:21px;margin:3px 42px 0 0}
+  .detail-panel:not(.expanded)>p{margin:4px 42px 0}
+  .detail-panel:not(.expanded) .overall-status{margin-top:12px;padding:11px}
+  .panel-expand{align-items:center;background:transparent;border:1px solid var(--line);border-radius:10px;color:var(--forest);cursor:pointer;display:flex;font-size:12px;font-weight:700;justify-content:space-between;margin-top:12px;padding:9px 12px;width:100%}
+  .panel-expand:focus-visible{outline:3px solid #287cba;outline-offset:2px}
+  .detail-panel.expanded{border-radius:0;bottom:0;height:100%;left:0;max-height:none;overflow:auto;padding:calc(24px + env(safe-area-inset-top)) 17px calc(40px + env(safe-area-inset-bottom));position:fixed;right:0;top:0;width:100%}
+  body.panel-open:not(.panel-expanded) .time-control{bottom:250px}
+  body.panel-expanded .time-control{display:none}
+}
+
+@media(max-width:650px) and (max-height:600px){
+  body.panel-open:not(.panel-expanded) .time-control{display:none}
+}
+
+@media(prefers-color-scheme:dark){
+  .panel-expand{color:#83d2b6}
 }
