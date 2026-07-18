@@ -1,4 +1,4 @@
-# Databuild en Pages-deployment, elke 6 uur.
+# Databuild en Pages-deployment, elk uur.
 #
 # Technische buildregels:
 # - secrets alleen via GitHub Actions Secrets (FIRMS_MAP_KEY), nooit in logs;
@@ -11,7 +11,7 @@ name: build
 
 on:
   schedule:
-    - cron: "7 */6 * * *" # elke 6 uur; niet op :00 vanwege GitHub-cronpiek
+    - cron: "7 * * * *" # elk uur; niet op :00 vanwege GitHub-cronpiek
   workflow_dispatch:
 
 permissions:
