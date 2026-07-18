@@ -3,7 +3,7 @@ import io, json, tarfile
 from datetime import datetime, timezone
 
 from pipeline import run
-from pipeline.adapters import aemet_danger, aemet_warnings, cems_rapid_mapping, firms, galicia_irdi, meteo_forets, meteoalarm_warnings, pla_alfa
+from pipeline.adapters import aemet_danger, aemet_warnings, cems_rapid_mapping, effis_danger, firms, galicia_irdi, meteo_forets, meteoalarm_warnings, pla_alfa
 
 _EMPTY_ATOM = (b'<feed xmlns="http://www.w3.org/2005/Atom" '
               b'xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">'
@@ -36,6 +36,9 @@ def test_pipeline_volledig_offline(monkeypatch, tmp_path):
     monkeypatch.setattr(aemet_danger, "http_get", lambda *args, **kwargs: danger_tar)
     monkeypatch.setattr(aemet_danger, "convert_geotiff", lambda name, data, sld: {"png": b"\x89PNG\r\n\x1a\nsynthetic", "meta": {"name":name,"bounds":{"west":-10,"south":35,"east":5,"north":44},"width":1,"height":1,"crs":"EPSG:4326","classes":{"1":{"color":"#4b96e3","label":"zeer laag"}}}})
 
+    monkeypatch.setattr(effis_danger, "http_get", lambda url, **kwargs: b"synthetic-png")
+    monkeypatch.setattr(effis_danger, "_validate_png", lambda data: None)
+
     activation = {"code":"EMSRTEST","name":"Synthetic wildfire","category":"Wildfire","centroid":"POINT (2.7 48.4)","activationTime":stamp,"drmPhase":"Response","closed":False,"n_products":1}
     monkeypatch.setattr(cems_rapid_mapping, "http_get_json", lambda url: {"results":[activation],"next":None})
 
@@ -56,12 +59,13 @@ def test_pipeline_volledig_offline(monkeypatch, tmp_path):
     output = tmp_path / "public" / "data"
     assert run.main(["--output", str(output)]) == 0
     manifest = json.loads((output / "manifest.json").read_text())
-    expected = {"firms","meteo_forets","aemet_warnings","aemet_danger","cems_rapid_mapping","pla_alfa","galicia_irdi"}
+    expected = {"firms","meteo_forets","aemet_warnings","aemet_danger","effis_danger","cems_rapid_mapping","pla_alfa","galicia_irdi"}
     expected |= {f"meteoalarm_{cc}" for cc in ("nl","be","lu","de","at","ch","it","fr")}
     assert set(manifest["sources"]) == expected
     assert all(entry["status"].startswith("ok") for entry in manifest["sources"].values())
     assert (output / "detections.latest.geojson.gz").exists()
     assert (output / "danger/es/aemet" / f"down_{compact}_peligro_p_D00.png").exists()
+    assert (output / "danger/eu/effis.index.latest.geojson.gz").exists()
     assert (output / "danger/es/cat/pla-alfa.latest.geojson.gz").exists()
     assert (output / "danger/es/gal/irdi.latest.geojson.gz").exists()
     assert manifest["sources"]["galicia_irdi"]["coverage"]["municipalities_expected"] == 313

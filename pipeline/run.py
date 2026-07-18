@@ -15,7 +15,7 @@ from pathlib import Path
 
 from . import meteoalarm_geometry
 from .adapters import (
-    aemet_danger, aemet_warnings, cems_rapid_mapping, firms,
+    aemet_danger, aemet_warnings, cems_rapid_mapping, effis_danger, firms,
     galicia_irdi, meteo_forets, meteoalarm_warnings, pla_alfa,
 )
 from .artifact import ArtifactError, build
@@ -27,6 +27,7 @@ ADAPTERS = (
     meteo_forets,
     aemet_warnings,
     aemet_danger,
+    effis_danger,
     cems_rapid_mapping,
     pla_alfa,
     galicia_irdi,

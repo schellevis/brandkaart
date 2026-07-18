@@ -1,6 +1,6 @@
 # Brandkaart Europa
 
-Concept voor een publieksgerichte kaart met natuurbranddetecties, brandgevaar, officiële waarschuwingen en lokale maatregelen in Europa. De eerste regionale verdieping richt zich op Frankrijk en Spanje.
+Publieksgerichte kaart met natuurbranddetecties, brandgevaar en officiële waarschuwingen in Europa. EFFIS levert een geharmoniseerde Europese basis voor brandgevaar; stabiele nationale en regionale bronnen verfijnen die lokaal.
 
 De productieversie is volledig statisch: GitHub Actions haalt de brondata elk uur op, bouwt een gecontroleerd artefact zonder secrets of PII en publiceert dit via GitHub Pages.
 
@@ -14,7 +14,7 @@ uv run python -m http.server 8000 -d prototype
 
 Open daarna `http://localhost:8000`.
 
-> De prototypekaart bevat uitsluitend fictieve incidenten en waarschuwingen. Er zijn nog geen live databronnen aangesloten.
+> De losse kaart in `prototype/` gebruikt fictieve gegevens. De productiefrontend in `web/` gebruikt de hieronder beschreven pipeline-uitvoer.
 
 ## Dataprototype
 
@@ -25,7 +25,7 @@ uv run python -m pipeline.run   # artefact bouwen
 uv run pytest                   # tests
 ```
 
-Bronnen: NASA FIRMS (vereist `FIRMS_MAP_KEY` als omgevingsvariabele, anders overgeslagen), Météo des forêts, AEMET-waarschuwingen, AEMET-brandgevaar en CEMS Rapid Mapping. Een falende bron blokkeert de andere bronnen niet; een PII- of secretovertreding blokkeert de volledige publicatie. De gegenereerde data wordt niet gecommit.
+Bronnen: NASA FIRMS (vereist `FIRMS_MAP_KEY` als omgevingsvariabele, anders overgeslagen), EFFIS Europees brandgevaar, Météo des forêts, AEMET-waarschuwingen en -brandgevaar, MeteoAlarm, Pla Alfa, Galicia IRDI en CEMS Rapid Mapping. Een falende bron blokkeert de andere bronnen niet; een PII- of secretovertreding blokkeert de volledige publicatie. De gegenereerde data wordt niet gecommit.
 
 ## Productiefrontend lokaal testen
 

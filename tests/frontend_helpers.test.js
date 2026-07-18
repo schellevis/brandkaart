@@ -6,6 +6,7 @@ const {
   currentIncidentFeatures,
   dangerValidOnDay,
   hasPointGeometry,
+  rasterPixel,
   safeUrl,
   targetDateKey,
 } = require("../web/app-helpers.js");
@@ -55,4 +56,15 @@ test("alleen http- en https-links blijven klikbaar", () => {
   assert.equal(safeUrl("HTTP://example.test/bron"), "HTTP://example.test/bron");
   assert.equal(safeUrl("javascript:alert(1)"), "#");
   assert.equal(safeUrl("data:text/html,misbruik"), "#");
+});
+
+test("Web Mercator-raster plaatst Nederland niet zes graden te noordelijk", () => {
+  const meta = {
+    bounds: { west: -25, south: 25, east: 50, north: 72 },
+    crs: "EPSG:3857",
+    width: 1200,
+    height: 752,
+  };
+
+  assert.deepEqual(rasterPixel(meta, 52, 5), { x: 480, y: 419 });
 });

@@ -87,22 +87,23 @@ main{height:calc(100% - 72px)}
 
 .panel-expand{display:none}
 
+
 /* Mobiele locatiedetails beginnen als compact kaartje en kunnen fullscreen open. */
 @media(max-width:650px){
   .detail-panel{border-radius:18px;bottom:8px;height:auto;left:8px;max-height:calc(100% - 16px);overflow:hidden;padding:18px;right:8px;top:auto;width:auto}
   .detail-panel:not(.expanded) .detail-content{display:none}
-  .detail-panel:not(.expanded) h1{font-size:21px;margin:3px 42px 0 0}
-  .detail-panel:not(.expanded)>p{margin:4px 42px 0}
-  .detail-panel:not(.expanded) .overall-status{margin-top:12px;padding:11px}
+  .detail-panel:not(.expanded){padding:14px 16px}
+  .detail-panel:not(.expanded)>.eyebrow,.detail-panel:not(.expanded)>p{display:none}
+  .detail-panel:not(.expanded) h1{font-size:19px;margin:0 104px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .detail-panel:not(.expanded) .overall-status{background:transparent;display:block;margin:7px 0 0;padding:0}
+  .detail-panel:not(.expanded) .overall-status .status-icon,.detail-panel:not(.expanded) .overall-status .eyebrow{display:none}
+  .detail-panel:not(.expanded) .overall-status strong{color:var(--muted);font-size:13px;font-weight:600;line-height:1.35;margin:0;padding-right:34px}
+  .detail-panel:not(.expanded) .panel-close{right:10px;top:8px}
+  .detail-panel:not(.expanded) .panel-expand{border:0;gap:5px;justify-content:center;margin:0;padding:6px;position:absolute;right:39px;top:7px;width:auto}
   .panel-expand{align-items:center;background:transparent;border:1px solid var(--line);border-radius:10px;color:var(--forest);cursor:pointer;display:flex;font-size:12px;font-weight:700;justify-content:space-between;margin-top:12px;padding:9px 12px;width:100%}
   .panel-expand:focus-visible{outline:3px solid #287cba;outline-offset:2px}
   .detail-panel.expanded{border-radius:0;bottom:0;height:100%;left:0;max-height:none;overflow:auto;padding:calc(24px + env(safe-area-inset-top)) 17px calc(40px + env(safe-area-inset-bottom));position:fixed;right:0;top:0;width:100%}
-  body.panel-open:not(.panel-expanded) .time-control{bottom:250px}
-  body.panel-expanded .time-control{display:none}
-}
-
-@media(max-width:650px) and (max-height:600px){
-  body.panel-open:not(.panel-expanded) .time-control{display:none}
+  body.panel-open .time-control{display:none}
 }
 
 @media(prefers-color-scheme:dark){

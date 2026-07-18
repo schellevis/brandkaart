@@ -50,5 +50,49 @@ def test_locatiedetails_beginnen_op_mobiel_ingevouwen_en_kunnen_fullscreen():
     assert 'setPanelExpanded(false); analyzeLocation()' in source
     assert 'detailPanel.classList.toggle("expanded",expanded)' in source
     assert ".detail-panel:not(.expanded) .detail-content{display:none}" in styles
+    assert ".detail-panel:not(.expanded)>.eyebrow,.detail-panel:not(.expanded)>p{display:none}" in styles
+    assert "body.panel-open .time-control{display:none}" in styles
     assert ".detail-panel.expanded{border-radius:0" in styles
     assert "position:fixed" in styles[styles.index(".detail-panel.expanded") :]
+
+
+def test_meteoalarm_landstatus_staat_in_bronnendialoog_niet_in_lagenpaneel():
+    html = (ROOT / "web/index.html").read_text("utf-8")
+    source = (ROOT / "web/app.js").read_text("utf-8")
+    layers = html[html.index('<section class="layer-card') : html.index("</section>")]
+    sources = html[html.index('<dialog id="sources-dialog"') :]
+    assert "Details per land" not in layers
+    assert 'id="warning-source-detail"' not in html
+    assert "Waarschuwingen per land" not in sources
+    assert 'id="source-status"' in sources
+    for country_code in ("NL", "BE", "LU", "DE", "AT", "CH", "IT", "FR"):
+        assert f'"MeteoAlarm ({country_code})"' in source
+    assert "renderSources();" in source
+
+
+def test_brandgevaar_is_een_gegroepeerde_laagschakelaar():
+    html = (ROOT / "web/index.html").read_text("utf-8")
+    source = (ROOT / "web/app.js").read_text("utf-8")
+    assert 'data-layer="danger"' in html
+    assert 'data-layer="dangerFr"' not in html
+    assert 'data-layer="dangerEs"' not in html
+    assert 'data-layer="dangerRegional"' not in html
+    assert 'danger: ["dangerEffis","dangerFr","dangerEs","dangerRegional"]' in source
+
+
+def test_effis_is_basisraster_en_lokale_rasters_krijgen_voorrang():
+    html = (ROOT / "web/index.html").read_text("utf-8")
+    source = (ROOT / "web/app.js").read_text("utf-8")
+    assert "geharmoniseerd EFFIS-brandgevaar" in html
+    assert "renderEffisRaster(); await renderRaster()" in source
+    assert "if(!prioritize)overlay.bringToBack()" in source
+    assert "if(prioritize)state.rasterSample.unshift(sample)" in source
+    assert "effis_danger: \"EFFIS Europees brandgevaar\"" in source
+
+
+def test_satellietdetecties_tonen_standaard_de_laatste_24_uur():
+    html = (ROOT / "web/index.html").read_text("utf-8")
+    source = (ROOT / "web/app.js").read_text("utf-8")
+    assert "hours: 24" in source
+    assert '<button data-hours="1" aria-pressed="false">Nu</button>' in html
+    assert '<button data-hours="24" class="active" aria-pressed="true">24 uur</button>' in html

@@ -25,6 +25,7 @@ LAYER_FILES = {
     "aemet_warnings": "warnings.es.latest.geojson",
     "meteo_forets": "danger/fr/meteo-des-forets.latest.geojson",
     "aemet_danger": "danger/es/aemet.index.latest.geojson",
+    "effis_danger": "danger/eu/effis.index.latest.geojson",
     "pla_alfa": "danger/es/cat/pla-alfa.latest.geojson",
     "galicia_irdi": "danger/es/gal/irdi.latest.geojson",
     "canarias_alerts": "measures/es/canarias-alerts.latest.geojson",

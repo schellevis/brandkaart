@@ -53,11 +53,29 @@
     return Number(props.source_attrs?.day_offset) === Number(dayOffset);
   }
 
+  function rasterPixel(meta, lat, lon) {
+    const bounds = meta?.bounds;
+    if (!bounds || lon < bounds.west || lon > bounds.east
+      || lat < bounds.south || lat > bounds.north) return null;
+    const xRatio = (lon - bounds.west) / (bounds.east - bounds.west);
+    let yRatio = (bounds.north - lat) / (bounds.north - bounds.south);
+    if (meta.crs === "EPSG:3857") {
+      const mercatorY = value => Math.log(Math.tan(Math.PI / 4 + value * Math.PI / 360));
+      yRatio = (mercatorY(bounds.north) - mercatorY(lat))
+        / (mercatorY(bounds.north) - mercatorY(bounds.south));
+    }
+    return {
+      x: Math.min(meta.width - 1, Math.max(0, Math.floor(xRatio * meta.width))),
+      y: Math.min(meta.height - 1, Math.max(0, Math.floor(yRatio * meta.height))),
+    };
+  }
+
   return {
     currentIncidentFeatures,
     dangerValidOnDay,
     hasPointGeometry,
     isClosedIncident,
+    rasterPixel,
     safeUrl,
     targetDateKey,
   };
