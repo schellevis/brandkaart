@@ -2,7 +2,7 @@
 
 Concept voor een publieksgerichte kaart met natuurbranddetecties, brandgevaar, officiële waarschuwingen en lokale maatregelen in Europa. De eerste regionale verdieping richt zich op Frankrijk en Spanje.
 
-De productieversie is volledig statisch: GitHub Actions haalt de brondata elke 6 uur op, bouwt een gecontroleerd artefact zonder secrets of PII en publiceert dit via GitHub Pages.
+De productieversie is volledig statisch: GitHub Actions haalt de brondata elk uur op, bouwt een gecontroleerd artefact zonder secrets of PII en publiceert dit via GitHub Pages.
 
 - [Klikbare dummy-mockup](prototype/README.md)
 
@@ -18,7 +18,7 @@ Open daarna `http://localhost:8000`.
 
 ## Dataprototype
 
-`pipeline/` bevat het handmatig uitvoerbare dataprototype dat dezelfde stappen gebruikt als de GitHub Action die elke 6 uur draait: bronnen ophalen, normaliseren via een veld-allowlist, valideren (PII, secrets, versheid, plausibiliteit) en een statisch artefact met `manifest.json` schrijven naar `public/data/`.
+`pipeline/` bevat het handmatig uitvoerbare dataprototype dat dezelfde stappen gebruikt als de GitHub Action die elk uur draait: bronnen ophalen, normaliseren via een veld-allowlist, valideren (PII, secrets, versheid, plausibiliteit) en een statisch artefact met `manifest.json` schrijven naar `public/data/`.
 
 ```bash
 uv run python -m pipeline.run   # artefact bouwen
