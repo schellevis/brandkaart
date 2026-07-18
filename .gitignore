@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Gegenereerde pipeline-output (het Pages-artefact is het publicatieproduct,
+# gegenereerde data wordt niet gecommit)
+public/
+
+# Lokale browserinspectie en screenshots/logs
+.playwright-mcp/
+
+# Lokale projectnotities en interne werkdocumenten
+docs/
+docs.old/
+CLAUDE.md

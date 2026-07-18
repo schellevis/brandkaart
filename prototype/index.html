@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Klikbare dummy-mockup voor Brandkaart Europa">
+  <title>Brandkaart Europa — demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynHTInXbKjMZbMZ/B4l+6SRTpA4=" crossorigin="">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="demo-ribbon" role="status">
+    <span>Concept</span>
+    Alle meldingen en risico's in deze mockup zijn fictief
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Brandkaart Europa">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40">
+          <path class="flame-outer" d="M24.1 3.8c1.3 6.5-2.5 8.6-1.2 13.3 2-1.4 3.2-3.7 3.3-6.5 5 4.8 7.5 9 6.5 14.5C31.5 32 26.3 36.3 19.5 36.3 12.7 36.3 7.6 31.7 7.6 25c0-5.4 3.7-10.3 10.3-15.2-.5 4.8.4 7.9 2.8 9.5-1.6-6.5.5-11.4 3.4-15.5Z"/>
+          <path class="flame-core" d="M20.5 33.1c-3.5 0-6.1-2.4-6.1-5.8 0-2.8 1.8-5.2 5.2-7.8-.1 2.4.6 4 1.9 4.8-.6-2.8.4-5.1 2.1-7.2 2.6 3 3.8 5.8 3.3 8.8-.6 4.3-3.2 7.2-6.4 7.2Z"/>
+        </svg>
+      </span>
+      <span><strong>Brandkaart</strong></span>
+    </a>
+
+    <div class="search-shell" role="search">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <input id="location-search" type="search" autocomplete="off" placeholder="Zoek plaats of regio…" aria-label="Zoek plaats of regio" aria-controls="search-results">
+      <kbd>⌘ K</kbd>
+      <div id="search-results" class="search-results" hidden></div>
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-button" id="locate-button" type="button" aria-label="Gebruik mijn locatie" title="Gebruik mijn locatie">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      </button>
+      <a class="emergency-link" href="tel:112"><span>Direct gevaar?</span><strong>Bel 112</strong></a>
+    </div>
+  </header>
+
+  <main>
+    <div id="map" aria-label="Kaart met fictieve brandinformatie"></div>
+
+    <section class="layer-card floating-card" aria-labelledby="layers-heading">
+      <div class="card-title-row">
+        <h2 id="layers-heading">Kaartlagen</h2>
+        <button class="collapse-button" type="button" aria-label="Kaartlagen inklappen">−</button>
+      </div>
+
+      <label class="layer-toggle">
+        <input type="checkbox" data-layer="detections" checked>
+        <span class="toggle-control"></span>
+        <span class="layer-symbol detection-symbol"></span>
+        <span><strong>Satellietdetecties</strong><small>Geen bevestigde branden</small></span>
+        <span class="count">7</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" data-layer="risk" checked>
+        <span class="toggle-control"></span>
+        <span class="layer-symbol risk-symbol"></span>
+        <span><strong>Brandgevaar</strong><small>Vandaag · modelberekening</small></span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" data-layer="warnings" checked>
+        <span class="toggle-control"></span>
+        <span class="layer-symbol warning-symbol">!</span>
+        <span><strong>Waarschuwingen</strong><small>Officiële instanties</small></span>
+        <span class="count accent">4</span>
+      </label>
+      <label class="layer-toggle">
+        <input type="checkbox" data-layer="closures" checked>
+        <span class="toggle-control"></span>
+        <span class="layer-symbol closure-symbol">×</span>
+        <span><strong>Afsluitingen</strong><small>Toegang en evacuaties</small></span>
+        <span class="count dark">2</span>
+      </label>
+    </section>
+
+    <div class="map-controls" aria-label="Kaartbediening">
+      <button id="zoom-in" type="button" aria-label="Inzoomen">+</button>
+      <button id="zoom-out" type="button" aria-label="Uitzoomen">−</button>
+    </div>
+
+    <aside class="detail-panel" aria-labelledby="location-title">
+      <div class="panel-handle" aria-hidden="true"></div>
+      <button class="panel-close" type="button" aria-label="Sluit locatiepaneel">×</button>
+
+      <div class="location-heading">
+        <span class="eyebrow">Geselecteerde locatie</span>
+        <h1 id="location-title">Collioure</h1>
+        <p id="location-subtitle">Pyrénées-Orientales · Frankrijk</p>
+      </div>
+
+      <div class="overall-status status-high">
+        <div class="status-gauge" aria-hidden="true"><span></span></div>
+        <div>
+          <span class="eyebrow">Situatie in de omgeving</span>
+          <strong id="summary-title">Extra opletten</strong>
+        </div>
+        <span class="status-label">Hoog</span>
+      </div>
+
+      <p class="plain-summary" id="plain-summary">Hoog brandgevaar. Er zijn twee recente satellietdetecties binnen 25 km, maar geen daarvan is lokaal bevestigd als natuurbrand.</p>
+
+      <section class="alert-card official-alert">
+        <div class="alert-icon">!</div>
+        <div>
+          <div class="alert-meta"><span>Officiële maatregel</span><time>tot 20:00</time></div>
+          <h2>Toegang tot twee bosmassieven beperkt</h2>
+          <p>Gemotoriseerd verkeer en open vuur zijn niet toegestaan.</p>
+          <a href="#source-note">Bekijk bericht van de prefectuur <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-heading">
+          <h2>Brandgevaar</h2>
+          <span>Model · geen waarschuwing</span>
+        </div>
+        <div class="forecast-strip">
+          <div><span>Vandaag</span><strong class="risk-high">Hoog</strong><small>EFFIS FWI</small></div>
+          <div><span>Morgen</span><strong class="risk-extreme">Zeer hoog</strong><small>Météo des forêts</small></div>
+          <div><span>Overmorgen</span><strong class="risk-medium">Matig</strong><small>Météo des forêts</small></div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-heading">
+          <h2>In de buurt</h2>
+          <button type="button">Binnen 25 km⌄</button>
+        </div>
+        <article class="nearby-item">
+          <span class="nearby-marker detection-marker"><i></i></span>
+          <div><strong>Satellietdetectie</strong><p>8,4 km zuidwest · VIIRS</p></div>
+          <div class="item-time"><strong>47 min</strong><span>Niet bevestigd</span></div>
+        </article>
+        <article class="nearby-item">
+          <span class="nearby-marker weather-marker">!</span>
+          <div><strong>Waarschuwing voor hitte</strong><p>Pyrénées-Orientales · MeteoAlarm</p></div>
+          <div class="item-time"><strong>Geel</strong><span>tot 22:00</span></div>
+        </article>
+      </section>
+
+      <section id="source-note" class="source-note">
+        <div><span class="live-dot"></span><strong>Demo bijgewerkt om 14:32</strong></div>
+        <p>Fictieve data gebaseerd op de beoogde bronnen: EFFIS, NASA FIRMS, Météo-France, AEMET en lokale autoriteiten.</p>
+      </section>
+    </aside>
+
+    <div class="time-control floating-card">
+      <button class="time-arrow" type="button" aria-label="Vorige periode">‹</button>
+      <div class="time-tabs" role="tablist" aria-label="Periode">
+        <button class="active" role="tab" aria-selected="true">Nu</button>
+        <button role="tab" aria-selected="false">24 uur</button>
+        <button role="tab" aria-selected="false">48 uur</button>
+        <button role="tab" aria-selected="false">7 dagen</button>
+      </div>
+      <div class="time-stamp"><span class="live-dot"></span><strong>Live concept</strong><small>15 juli · 14:32</small></div>
+      <button class="time-arrow" type="button" aria-label="Volgende periode">›</button>
+    </div>
+
+    <div class="legend-note">Kaartdata © OpenStreetMap · <button type="button">Bronnen & uitleg</button></div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>

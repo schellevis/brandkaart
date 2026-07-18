@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Actuele Europese natuurbranddetecties, brandgevaar en officiële waarschuwingen.">
+  <title>Brandkaart Europa</title>
+  <link rel="icon" href="brandkaart-logo.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#ff3b10">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Brandkaart, beginpagina"><img class="brand-mark" src="brandkaart-logo.svg" width="41" height="41" alt="" aria-hidden="true"><span><strong>Brandkaart</strong></span></a>
+    <div class="search-shell" role="search">
+      <label class="sr-only" for="location-search">Zoek een plaats of voer coördinaten in</label>
+      <span aria-hidden="true">⌕</span><input id="location-search" type="search" autocomplete="off" placeholder="Zoek plaats of coördinaten…" aria-controls="search-results" aria-expanded="false">
+      <button id="locate-button" class="location-button" type="button" aria-label="Gebruik mijn huidige locatie" title="Positie blijft in deze browser"><span aria-hidden="true">◎</span> Mijn locatie</button>
+      <div id="search-results" class="search-results" role="listbox" hidden></div>
+    </div>
+  </header>
+  <main>
+    <div id="map" role="application" aria-label="Interactieve kaart met brandinformatie"></div>
+    <section class="layer-card floating-card" aria-labelledby="layers-heading">
+      <div class="card-title-row"><h2 id="layers-heading">Kaartlagen</h2><button id="collapse-layers" type="button" aria-label="Kaartlagen inklappen" aria-expanded="true">−</button></div>
+      <label class="layer-toggle"><input type="checkbox" data-layer="detections" checked><span class="toggle-control"></span><span class="symbol detection"></span><span><strong>Satellietdetecties</strong><small>Thermische anomalie, niet bevestigd</small></span><b id="count-detections">–</b></label>
+      <label class="layer-toggle"><input type="checkbox" data-layer="incidents" checked><span class="toggle-control"></span><span class="symbol incident" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2c1.7 2.8-.6 4.4.4 6.8.8-.5 1.4-1.4 1.7-2.7C16.5 5 18 8.3 18 11.3a6 6 0 1 1-12 0c0-1.9.9-3.7 2.5-5.2C8.3 8 9.4 8.9 10.7 8.9 9 6.2 9.4 3.9 12 2z"/></svg></span><span><strong>Bevestigde incidenten</strong><small>CEMS-activaties; dekking onvolledig</small></span><b id="count-incidents">–</b></label>
+      <label class="layer-toggle"><input type="checkbox" data-layer="warnings" checked><span class="toggle-control"></span><span class="symbol warning">!</span><span><strong>Waarschuwingen</strong><small>Officiële avisos · AEMET &amp; MeteoAlarm</small></span><b id="count-warnings">–</b></label>
+      <label class="layer-toggle"><input type="checkbox" data-layer="dangerFr" checked><span class="toggle-control"></span><span class="symbol danger"></span><span><strong>Gevaar Frankrijk</strong><small>Météo des forêts</small></span><b id="count-dangerFr">–</b></label>
+      <label class="layer-toggle"><input type="checkbox" data-layer="dangerEs" checked><span class="toggle-control"></span><span class="symbol raster"></span><span><strong>Gevaar Spanje</strong><small>AEMET-model · <span id="danger-day-label">D+0</span></small></span></label>
+      <label class="layer-toggle"><input type="checkbox" data-layer="dangerRegional" checked><span class="toggle-control"></span><span class="symbol danger"></span><span><strong>Regionaal gevaar</strong><small>Pla Alfa · Galicië IRDI</small></span><b id="count-dangerRegional">–</b></label>
+    </section>
+    <div class="map-controls" aria-label="Kaartbediening"><button id="zoom-in" type="button" aria-label="Inzoomen">+</button><button id="zoom-out" type="button" aria-label="Uitzoomen">−</button></div>
+    <aside id="detail-panel" class="detail-panel" aria-labelledby="location-title" hidden>
+      <button id="panel-close" class="panel-close" type="button" aria-label="Locatiepaneel sluiten">×</button>
+      <span class="eyebrow">Geselecteerde locatie</span><h1 id="location-title">Locatie</h1><p id="location-subtitle"></p>
+      <div id="overall-status" class="overall-status"><span class="status-icon" aria-hidden="true">i</span><div><span class="eyebrow">Situatie in de omgeving</span><strong id="summary-title">Bezig met bepalen…</strong></div></div>
+      <p id="plain-summary" class="plain-summary"></p>
+      <section class="panel-section"><div class="section-heading"><h2>Brandgevaar</h2><span>Model · geen brandmelding</span></div><div id="danger-summary" class="forecast-strip"></div></section>
+      <section class="panel-section"><div class="section-heading"><h2>Officiële waarschuwingen</h2></div><div id="warning-summary"></div></section>
+      <section class="panel-section"><div class="section-heading"><h2>In de buurt</h2><label>Straal <select id="radius"><option value="25">25 km</option><option value="50">50 km</option></select></label></div><div id="nearby-summary"></div></section>
+      <p class="coverage-note"><strong>Maatregelen:</strong> er zijn nog geen lokale maatregelenbronnen aangesloten. Geen resultaat betekent niet dat er lokaal geen beperking geldt.</p>
+    </aside>
+    <div class="time-control floating-card" aria-label="Periode en gevaardag"><div class="time-tabs" role="group" aria-label="Detectieperiode"><button data-hours="1" class="active" aria-pressed="true">Nu</button><button data-hours="24" aria-pressed="false">24 uur</button><button data-hours="48" aria-pressed="false">48 uur</button></div><div class="day-tabs" role="group" aria-label="Dag brandgevaar"><button data-day="0" class="active" aria-pressed="true">Vandaag</button><button data-day="1" aria-pressed="false">Morgen</button><button data-day="2" aria-pressed="false">Overmorgen</button></div></div>
+    <div class="status-bar">
+      <button id="sources-open" class="sources-open" type="button">Bronnen, status & uitleg</button>
+      <div id="data-banner" class="data-banner" role="status" aria-live="polite">Gegevens laden…</div>
+    </div>
+  </main>
+  <dialog id="welcome-dialog" class="welcome-dialog" aria-labelledby="welcome-title">
+    <h2 id="welcome-title">Voordat je begint</h2>
+    <p>Deze tool is experimenteel. Gebruik hem naast andere, officiële informatiebronnen. Brandhaarden zijn beschikbaar voor heel Europa; brandgevaar voor Spanje en Frankrijk; officiële waarschuwingen voor Spanje (AEMET) en — via MeteoAlarm — Nederland, België, Luxemburg, Duitsland, Oostenrijk, Zwitserland, Italië en Frankrijk. MeteoAlarm-waarschuwingen worden vertraagd getoond.</p>
+    <button id="welcome-ok" class="welcome-ok" type="button">Ok</button>
+  </dialog>
+  <dialog id="sources-dialog"><div class="dialog-head"><h2>Bronnen, status & uitleg</h2><button type="button" id="sources-close" aria-label="Sluiten">×</button></div><p><strong>Bel bij direct gevaar 112</strong> en volg lokale autoriteiten. Brandkaart geeft geen route- of evacuatieadvies.</p><p>Satellietdetecties zijn thermische anomalieën en dus geen bevestigde natuurbranden. Brandgevaar is een modelinschatting. Uit het verdwijnen van een detectie volgt nooit dat een brand onder controle of geblust is.</p><div id="source-status"></div><h3>Privacy</h3><p>Zoeken gebeurt lokaal en browserlocatie wordt alleen na toestemming gebruikt en niet verstuurd of opgeslagen. Alleen de OpenStreetMap-kaarttegels komen tijdens gebruik van een derde partij; daarbij ontvangt de tegelserver technisch je IP-adres en de gevraagde kaarttegels. Scripts, data en plaatsnamen blijven lokaal.</p><p><strong>Weerwaarschuwingen buiten Spanje</strong> komen van EUMETNET – MeteoAlarm en worden hier <strong>vertraagd</strong> getoond; <a href="https://www.meteoalarm.org" target="_blank" rel="noopener">www.meteoalarm.org</a> is de actuele, gezaghebbende bron.</p><h3>Attributie</h3><ul><li>Fire detections courtesy of NASA FIRMS</li><li>© European Union, Copernicus Emergency Management Service</li><li>© AEMET — datum laatste actualisering wordt hierboven getoond</li><li>Weerwaarschuwingen buiten Spanje: EUMETNET – MeteoAlarm (<a href="https://www.meteoalarm.org" target="_blank" rel="noopener">www.meteoalarm.org</a>), CC BY 4.0</li><li>Source : Météo-France — Licence Ouverte 2.0 — datum laatste actualisering wordt hierboven getoond</li><li>Plaatsnamen: GeoNames (geonames.org), CC BY 4.0</li><li>Kaarttegels © OpenStreetMap-bijdragers</li></ul></dialog>
+  <script src="vendor/leaflet/leaflet.js"></script><script src="vendor/leaflet.markercluster/leaflet.markercluster.js"></script><script src="app-helpers.js?v=1"></script><script src="app.js?v=3"></script>
+</body>
+</html>

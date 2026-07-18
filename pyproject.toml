@@ -1,0 +1,25 @@
+[project]
+name = "brandkaart"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "defusedxml>=0.7.1",
+    "rasterio>=1.5.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+# Een deel van de vroege adapters gebruikt bewust compacte statements.
+# Houd Ruff inhoudelijk (namen/imports), zonder hier een repo-brede formatteerwijziging te doen.
+ignore = ["E401", "E701", "E702"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.12.4",
+]

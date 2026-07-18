@@ -1,0 +1,68 @@
+# Databuild en Pages-deployment, elke 6 uur.
+#
+# Technische buildregels:
+# - secrets alleen via GitHub Actions Secrets (FIRMS_MAP_KEY), nooit in logs;
+# - een gefaalde bron blokkeert de andere lagen niet (stale_reused-fallback);
+# - een PII/secret-overtreding laat pipeline.run met exitcode 1 falen en er
+#   wordt dan niets gedeployed — de vorige deployment blijft staan;
+# - concurrency voorkomt dat een oude run over een nieuwere heen publiceert.
+
+name: build
+
+on:
+  schedule:
+    - cron: "7 */6 * * *" # elke 6 uur; niet op :00 vanwege GitHub-cronpiek
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Dependencies installeren
+        run: uv sync --frozen
+
+      - name: Tests
+        run: uv run pytest -q
+
+      - name: Vorig artefact ophalen (stale_reused-fallback, best effort)
+        run: |
+          uv run python -m pipeline.restore \
+            --base-url "${{ format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}/data" \
+            --output public/data || true
+
+      - name: Pipeline draaien
+        env:
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+        run: uv run python -m pipeline.run --output public/data
+
+      - name: Statische frontend samenstellen
+        run: |
+          cp -a web/. public/
+          cp assets/places.eu.json.gz public/data/places.eu.json.gz
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
