@@ -1,10 +1,14 @@
-# Databuild en Pages-deployment, elk uur.
+# Databuild en Pages-deployment, elk uur. Een push naar main herpubliceert
+# alleen de frontend: de pipeline-stap wordt overgeslagen en de data komt
+# ongewijzigd uit het laatst gepubliceerde artefact (via pipeline.restore).
 #
 # Technische buildregels:
 # - secrets alleen via GitHub Actions Secrets (FIRMS_MAP_KEY), nooit in logs;
 # - een gefaalde bron blokkeert de andere lagen niet (stale_reused-fallback);
 # - een PII/secret-overtreding laat pipeline.run met exitcode 1 falen en er
 #   wordt dan niets gedeployed — de vorige deployment blijft staan;
+# - een push-run zonder bereikbaar vorig artefact faalt in plaats van een
+#   site zonder data te deployen;
 # - concurrency voorkomt dat een oude run over een nieuwere heen publiceert.
 
 name: build
@@ -13,6 +17,8 @@ on:
   schedule:
     - cron: "7 * * * *" # elk uur; niet op :00 vanwege GitHub-cronpiek
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -44,9 +50,14 @@ jobs:
             --output public/data || true
 
       - name: Pipeline draaien
+        if: github.event_name != 'push'
         env:
           FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
         run: uv run python -m pipeline.run --output public/data
+
+      - name: Push-run vereist een hersteld artefact
+        if: github.event_name == 'push'
+        run: test -f public/data/manifest.json
 
       - name: Statische frontend samenstellen
         run: |
