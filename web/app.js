@@ -158,7 +158,6 @@ async function load() {
     state.data.warnings={type:"FeatureCollection",features:[]};
     const warnKeys=Object.keys(s).filter(k=>k==="aemet_warnings"||k.startsWith("meteoalarm_"));
     jobs.push(...warnKeys.map(async k=>{const src=s[k];if(!src?.file)return;try{const fc=await fetchGzipJson(`data/${src.file}`);state.data.warnings.features.push(...(fc.features||[]));}catch(error){console.warn(k,error);}}));
-    jobs.push(fetchGzipJson("data/places.eu.json.gz").then(data=>state.places=data.places||[]).catch(error=>console.warn("Plaatsnamen niet beschikbaar",error)));
     await Promise.all(jobs); renderDetections(); renderVectors(); await renderEffisRaster(); await renderRaster(); renderSources();
     const troubled=Object.values(s).filter(x=>x.status!=="ok"); banner.textContent=`Live gegevens · gebouwd ${dateText(state.manifest.built_at)}${troubled.length?` · ${troubled.length} bron${troubled.length===1?"":"nen"} vertraagd of niet beschikbaar`:""}`; banner.className=`data-banner${troubled.length?" warning":""}`;
   } catch(error) { banner.textContent="Live manifest geladen, maar de kaartweergave is niet volledig beschikbaar";banner.className="data-banner warning";console.error(error); }
@@ -173,7 +172,11 @@ function setLayersCollapsed(collapsed){layerCard.classList.toggle("collapsed",co
 collapseBtn.onclick=()=>setLayersCollapsed(!layerCard.classList.contains("collapsed"));
 if(window.matchMedia("(max-width:650px)").matches)setLayersCollapsed(true);
 document.getElementById("panel-close").onclick=()=>{detailPanel.hidden=true;document.body.classList.remove("panel-open");setPanelExpanded(false);};
-const search=document.getElementById("location-search"),results=document.getElementById("search-results");search.oninput=renderSearch;search.onfocus=renderSearch;search.onkeydown=event=>{if(event.key==="Enter")results.querySelector("button")?.click();if(event.key==="Escape")results.hidden=true;};document.addEventListener("click",event=>{if(!event.target.closest(".search-shell"))results.hidden=true;});document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();search.focus();}});
+// De plaatsnamenindex is groot en alleen nodig bij zoeken; laad hem daarom pas
+// bij de eerste interactie met het zoekvak in plaats van bij elke paginalading.
+let placesReady=false,placesPromise=null;
+function ensurePlaces(){if(placesReady||placesPromise)return;placesPromise=fetchGzipJson("data/places.eu.json.gz").then(data=>{state.places=data.places||[];placesReady=true;renderSearch();}).catch(error=>{placesReady=true;console.warn("Plaatsnamen niet beschikbaar",error);});}
+const search=document.getElementById("location-search"),results=document.getElementById("search-results");const onSearchActivity=()=>{ensurePlaces();renderSearch();};search.oninput=onSearchActivity;search.onfocus=onSearchActivity;search.onkeydown=event=>{if(event.key==="Enter")results.querySelector("button")?.click();if(event.key==="Escape")results.hidden=true;};document.addEventListener("click",event=>{if(!event.target.closest(".search-shell"))results.hidden=true;});document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();search.focus();}});
 document.getElementById("locate-button").onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>selectLocation(p.coords.latitude,p.coords.longitude,"Jouw locatie","Browserlocatie · blijft lokaal"),()=>alert("Locatie kon niet worden gebruikt. Controleer de browsertoestemming."),{enableHighAccuracy:false,timeout:10000}):alert("Deze browser ondersteunt geen locatiebepaling.");
 map.on("click",event=>selectLocation(event.latlng.lat,event.latlng.lng,"Gekozen kaartlocatie"));
 const dialog=document.getElementById("sources-dialog");document.getElementById("sources-open").onclick=()=>dialog.showModal();document.getElementById("sources-close").onclick=()=>dialog.close();
