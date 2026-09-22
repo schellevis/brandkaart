@@ -1,6 +1,14 @@
-# Databuild en Pages-deployment, elk uur. Een push naar main herpubliceert
-# alleen de frontend: de pipeline-stap wordt overgeslagen en de data komt
-# ongewijzigd uit het laatst gepubliceerde artefact (via pipeline.restore).
+# Databuild en Pages-deployment.
+#
+# UITGESCHAKELD: deze workflow draait niet meer automatisch. De uurlijkse
+# cron en de push-trigger op main zijn verwijderd; alleen een handmatige
+# workflow_dispatch start nog een run. Zet de triggers hieronder terug om de
+# automatische publicatie weer aan te zetten.
+#
+# Oorspronkelijk gedrag (geldt nog bij een handmatige run): een push naar main
+# herpubliceerde alleen de frontend: de pipeline-stap wordt overgeslagen en de
+# data komt ongewijzigd uit het laatst gepubliceerde artefact (via
+# pipeline.restore).
 #
 # Technische buildregels:
 # - secrets alleen via GitHub Actions Secrets (FIRMS_MAP_KEY), nooit in logs;
@@ -14,11 +22,12 @@
 name: build
 
 on:
-  schedule:
-    - cron: "7 * * * *" # elk uur; niet op :00 vanwege GitHub-cronpiek
+  # Automatische triggers bewust uitgeschakeld; alleen handmatig te starten.
+  # schedule:
+  #   - cron: "7 * * * *" # elk uur; niet op :00 vanwege GitHub-cronpiek
+  # push:
+  #   branches: [main]
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
