@@ -44,7 +44,8 @@ reviews of gedateerde statusdocumenten.
 - `web/`: productiefrontend in HTML, CSS en vanilla JavaScript.
 - `tests/`: netwerkloze Python- en JavaScript-regressietests.
 - `assets/`: statische invoerassets voor pipeline en frontend.
-- `.github/workflows/build.yml`: test-, build- en deployworkflow.
+- `.github/workflows/build.yml`: test-, build- en deployworkflow; de
+  automatische triggers zijn uitgeschakeld, alleen `workflow_dispatch`.
 - `main.py`: ongebruikt scaffold; gebruik `python -m pipeline.run` als
   pipeline-entrypoint.
 - `prototype/`: losstaande dummy-interface; niet de productiefrontend.
